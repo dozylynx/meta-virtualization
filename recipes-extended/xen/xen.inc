@@ -100,6 +100,10 @@ RDEPENDS_${PN}-fsimage = " \
     libext2fs \
     "
 
+RDEPENDS_${PN}-libxenctrl = " \
+    ${PN}-libxendevicemodel \
+    "
+
 RDEPENDS_${PN}-misc = " \
     perl \
     python \
@@ -178,6 +182,8 @@ PACKAGES = "\
     ${PN}-libxencall-dev \
     ${PN}-libxenctrl \
     ${PN}-libxenctrl-dev \
+    ${PN}-libxendevicemodel \
+    ${PN}-libxendevicemodel-dev \
     ${PN}-libxenevtchn \
     ${PN}-libxenevtchn-dev \
     ${PN}-libxenforeignmemory \
@@ -282,6 +288,9 @@ FILES_${PN}-libxencall-dev = "${libdir}/libxencall.so"
 
 FILES_${PN}-libxenctrl = "${libdir}/libxenctrl.so.*"
 FILES_${PN}-libxenctrl-dev = "${libdir}/libxenctrl.so"
+
+FILES_${PN}-libxendevicemodel = "${libdir}/libxendevicemodel.so.*"
+FILES_${PN}-libxendevicemodel-dev = "${libdir}/libxendevicemodel.so"
 
 FILES_${PN}-libxenevtchn = "${libdir}/libxenevtchn.so.*"
 FILES_${PN}-libxenevtchn-dev = "${libdir}/libxenevtchn.so"
