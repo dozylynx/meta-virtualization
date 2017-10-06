@@ -24,3 +24,5 @@ LICENSE = "MIT"
 
 # Send console messages to xen console
 APPEND += "console=hvc0"
+
+IMAGE_FSTYPES_append = " vhd-image"
