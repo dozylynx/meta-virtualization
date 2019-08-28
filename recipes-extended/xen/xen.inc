@@ -32,6 +32,9 @@ DEPENDS = " \
     gettext-native \
     acpica-native \
     ncurses-native \
+    python-sphinx-native \
+    python-sphinx-rtd-theme-native \
+    python-sphinxcontrib-websupport-native \
     util-linux-native \
     xz-native \
     bridge-utils \
