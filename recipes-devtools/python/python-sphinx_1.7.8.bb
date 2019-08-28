@@ -10,3 +10,19 @@ SRC_URI[md5sum] = "7dfb075d8bd6a53b652bce1e4394c6a1"
 SRC_URI[sha256sum] = "a07050845cc9a2f4026a6035cc8ed795a5ce7be6528bbc82032385c10807dfe7"
 
 inherit setuptools pypi
+
+RDEPENDS_${PN} = " \
+    python-alabaster \
+    python-babel \
+    python-docutils \
+    python-imagesize \
+    python-jinja2 \
+    python-packaging \
+    python-pygments \
+    python-requests \
+    python-six \
+    python-snowballstemmer \
+    python-typing \
+    "
+
+BBCLASSEXTEND = "native"
