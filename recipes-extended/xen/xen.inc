@@ -151,7 +151,13 @@ RDEPENDS_${PN}-xentrace = "python"
 
 RDEPENDS_${PN}-xen-watchdog = "bash"
 
-PACKAGES = "\
+PACKAGES_hypervisor = "\
+    ${PN}-efi \
+    ${PN}-hypervisor \
+    ${PN}-hypervisor-dbg \
+    "
+
+PACKAGES_tools = "\
     ${PN}-base \
     ${PN}-blktap \
     ${PN}-console \
@@ -160,13 +166,11 @@ PACKAGES = "\
     ${PN}-dev \
     ${PN}-devd \
     ${PN}-doc \
-    ${PN}-efi \
     ${PN}-flask \
     ${PN}-flask-tools \
     ${PN}-fsimage \
     ${PN}-gdbsx \
     ${PN}-hvmloader \
-    ${PN}-hypervisor \
     ${PN}-init-xenstore-dom \
     ${PN}-kdd \
     ${PN}-libblktap \
@@ -1003,22 +1007,32 @@ do_configure() {
     fi
 }
 
-do_compile() {
+do_compile_prepend() {
     # workaround for build bug when CFLAGS is exported
     # https://www.mail-archive.com/xen-devel@lists.xen.org/msg67822.html
     unset CFLAGS
-
-    # Workaround for parallel build bug: build xen first.
-    # https://lists.xenproject.org/archives/html/xen-devel/2018-07/msg02551.html
-    oe_runmake xen
-    oe_runmake
 }
 
-do_install() {
+do_compile_hypervisor() {
+    oe_runmake xen
+}
+
+do_compile_tools() {
+    oe_runmake tools
+}
+
+do_install_prepend() {
     # CFLAGS is used to set PY_CFLAGS which affects the pygrub install
     # so also need to unset CFLAGS here:
     unset CFLAGS
-    oe_runmake DESTDIR="${D}" install
+}
+
+do_install_hypervisor() {
+    oe_runmake DESTDIR="${D}" install-xen
+}
+
+do_install_tools() {
+    oe_runmake DESTDIR="${D}" install-tools
 
     # remove installed volatiles
     rm -rf ${D}${base_prefix}/run \
