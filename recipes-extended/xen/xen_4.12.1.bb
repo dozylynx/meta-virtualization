@@ -1,3 +1,3 @@
 require xen.inc
-require xen-git.inc
+require xen-4.12.inc
 require xen-hypervisor.inc
