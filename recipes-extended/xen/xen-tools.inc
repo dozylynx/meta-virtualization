@@ -422,6 +422,7 @@ FILES_${PN}-misc = "\
     ${sbindir}/xenlockprof \
     ${sbindir}/xen-lowmemd \
     ${sbindir}/xen-mfndump \
+    ${sbindir}/xen-ucode \
     ${libdir}/xen/bin/verify-stream-v2 \
     ${libdir}/xen/bin/convert-legacy-stream \
     "
