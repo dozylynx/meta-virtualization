@@ -24,7 +24,10 @@ FILES_${PN} = " \
 
 FILES_${PN}-dbg += "${libdir}/debug/*"
 
-FILES_${PN}-efi = "${exec_prefix}/lib64/efi/xen*"
+FILES_${PN}-efi = " \
+    /boot/xen.efi \
+    ${exec_prefix}/lib64/efi/xen* \
+    "
 
 do_configure() {
     do_configure_common
