@@ -395,7 +395,6 @@ FILES_${PN}-gdbsx = "\
     ${sbindir}/gdbsx \
     "
 
-INSANE_SKIP_${PN}-hvmloader = "arch"
 FILES_${PN}-hvmloader = "\
     ${libdir}/xen/boot/hvmloader \
     "
@@ -445,7 +444,6 @@ FILES_${PN}-pygrub = "\
 FILES_${PN}-python = "\
     ${libdir}/python2.7 \
     "
-INSANE_SKIP_${PN} = "already-stripped"
 
 FILES_${PN}-remus = "\
     ${bindir}/remus \
@@ -491,7 +489,6 @@ FILES_${PN}-scripts-common = " \
     ${sysconfdir}/xen/scripts/xen-script-common.sh \
     "
 
-INSANE_SKIP_${PN}-shim = "arch"
 FILES_${PN}-shim = " \
     ${libdir}/xen/boot/xen-shim \
     "
@@ -623,6 +620,10 @@ FILES_${PN}-xendomains += "\
     ${sysconfdir}/sysconfig/xendomains \
     ${systemd_unitdir}/system/xendomains.service \
     "
+
+INSANE_SKIP_${PN} = "already-stripped"
+INSANE_SKIP_${PN}-hvmloader = "arch"
+INSANE_SKIP_${PN}-shim = "arch"
 
 # configure init.d scripts
 INITSCRIPT_PACKAGES = "${PN}-xend ${PN}-xencommons ${PN}-xen-watchdog ${PN}-xendomains ${PN}-devd"
