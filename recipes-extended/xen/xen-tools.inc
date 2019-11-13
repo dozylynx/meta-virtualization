@@ -53,6 +53,17 @@ RDEPENDS_${PN}-misc = " \
     python \
     "
 
+RDEPENDS_${PN}-python = " \
+    ${PN}-libxenctrl \
+    ${PN}-libxenguest \
+    python \
+    "
+
+RDEPENDS_${PN}-pygrub = " \
+    ${PN}-python \
+    python \
+    "
+
 RDEPENDS_${PN}-remus = " \
     bash \
     python \
