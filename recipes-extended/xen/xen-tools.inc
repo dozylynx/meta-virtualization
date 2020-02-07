@@ -6,6 +6,26 @@ COMPATIBLE_HOST = 'i686-oe-linux|(x86_64.*).*-linux|aarch64.*-linux|arm-.*-linux
 inherit setuptools3 update-rc.d systemd deploy
 require xen-blktap.inc
 
+# To build hvmloader, which is needed on x86-64 targets when 'hvm' is enabled
+# in PACKAGECONFIG, to support running HVM-mode guest VMs, some files from
+# 32-bit glibc are needed.
+# Add the multilib 32-bit glibc to DEPENDS only when necessary.
+#
+# To enable multilib, please add the following to your local.conf -:
+#
+#    require conf/multilib.conf
+#    MULTILIBS = "multilib:lib32"
+#    DEFAULTTUNE_virtclass-multilib-lib32 = "x86"
+
+# Use this multilib prefix for x86 32-bit to match local.conf:
+MLPREFIX_32 = "lib32-"
+
+# The DEPENDS on a multilib 32-bit glibc is only added when target is x86-64
+# and 'hvm' is enabled in PACKAGECONFIG:
+THIRTY_TWO_BIT_GLIBC_x86-64 = \
+    "${@bb.utils.contains('PACKAGECONFIG', 'hvm', '${MLPREFIX_32}glibc', '', d)}"
+DEPENDS += "${THIRTY_TWO_BIT_GLIBC}"
+
 RDEPENDS_${PN} = "\
     bash perl xz \
     ${PN}-console \
@@ -656,24 +676,20 @@ SYSTEMD_SERVICE_${PN}-xencommons = " \
     "
 SYSTEMD_SERVICE_${PN}-xendomains = "xendomains.service"
 
+# To build hvmloader, which is needed on x86-64 targets when 'hvm' is enabled
+# in PACKAGECONFIG, additional CFLAGS are needed to set the 32-bit sysroot.
+THIRTY_TWO_SYSROOT = "${WORKDIR}/${MLPREFIX_32}recipe-sysroot"
+THIRTY_TWO_BIT_SYSROOT_FLAGS_x86-64 = \
+    "${@bb.utils.contains('PACKAGECONFIG', 'hvm', \
+        'CFLAGS += "--sysroot=${THIRTY_TWO_SYSROOT}"', '', d)}"
+
 do_configure() {
     do_configure_common
-}
 
-do_stubs() {
-    # no stubs-32.h in our 64-bit sysroot - hack it into tools/include/gnu
-    if ! test -f ${STAGING_DIR_TARGET}/usr/include/gnu/stubs-32.h ; then
-        if test -f ${STAGING_DIR_TARGET}/usr/include/gnu/stubs-64.h ; then
-            test -d ${S}/tools/include/gnu || mkdir ${S}/tools/include/gnu
-            cat ${STAGING_DIR_TARGET}/usr/include/gnu/stubs-64.h | grep -v stub_bdflush | grep -v stub_getmsg | grep -v stub_putmsg > ${S}/tools/include/gnu/stubs-32.h
-            echo \#define __stub___kernel_cosl >> ${S}/tools/include/gnu/stubs-32.h
-            echo \#define __stub___kernel_sinl >> ${S}/tools/include/gnu/stubs-32.h
-            echo \#define __stub___kernel_tanl >> ${S}/tools/include/gnu/stubs-32.h
-        fi
+    if [ -n '${THIRTY_TWO_BIT_SYSROOT_FLAGS}' ] ; then
+        echo '${THIRTY_TWO_BIT_SYSROOT_FLAGS}' >>"${S}/tools/firmware/Rules.mk"
     fi
 }
-
-addtask stubs after do_configure before do_compile
 
 do_compile() {
     cd ${S}
