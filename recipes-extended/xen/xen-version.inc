@@ -5,6 +5,7 @@ XEN_BRANCH ?= "stable-4.12"
 
 SRC_URI = " \
     git://xenbits.xen.org/xen.git;branch=${XEN_BRANCH} \
+    file://xen-tools-generate-32bit-headers.patch \
     file://0001-python-pygrub-pass-DISTUTILS-xen.4.12.patch \
     file://xen-tools-update-python-scripts-to-py3.patch \
     file://xen-tools-libxl-gentypes-py3.patch \

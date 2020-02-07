@@ -660,21 +660,6 @@ do_configure() {
     do_configure_common
 }
 
-do_stubs() {
-    # no stubs-32.h in our 64-bit sysroot - hack it into tools/include/gnu
-    if ! test -f ${STAGING_DIR_TARGET}/usr/include/gnu/stubs-32.h ; then
-        if test -f ${STAGING_DIR_TARGET}/usr/include/gnu/stubs-64.h ; then
-            test -d ${S}/tools/include/gnu || mkdir ${S}/tools/include/gnu
-            cat ${STAGING_DIR_TARGET}/usr/include/gnu/stubs-64.h | grep -v stub_bdflush | grep -v stub_getmsg | grep -v stub_putmsg > ${S}/tools/include/gnu/stubs-32.h
-            echo \#define __stub___kernel_cosl >> ${S}/tools/include/gnu/stubs-32.h
-            echo \#define __stub___kernel_sinl >> ${S}/tools/include/gnu/stubs-32.h
-            echo \#define __stub___kernel_tanl >> ${S}/tools/include/gnu/stubs-32.h
-        fi
-    fi
-}
-
-addtask stubs after do_configure before do_compile
-
 do_compile() {
     cd ${S}
     oe_runmake tools PYTHON="${PYTHON}"
