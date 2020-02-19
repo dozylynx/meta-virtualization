@@ -775,5 +775,11 @@ do_deploy() {
         ln -sf ${FLASK_POLICY_FILE} ${DEPLOYDIR}/xenpolicy-${MACHINE}
     fi
 }
-
-addtask deploy after do_populate_sysroot
+# Run the deploy task after do_populate_sysroot to ensure that the same build
+# output is visible both to other recipes (via sysroot) and to tasks that use
+# deployed binaries. Deploy copies files from ${D} that are written during
+# do_install so must run after that task; and do_populate_sysroot does runs
+# after do_install.
+# Add the deploy task before do_build to ensure that deployment has completed
+# when the recipe build is done.
+addtask deploy after do_populate_sysroot before do_build
