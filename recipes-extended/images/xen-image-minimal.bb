@@ -16,6 +16,10 @@ IMAGE_INSTALL += " \
     qemu \
     "
 
+# On ARM platforms, include the hypervisor in the dom0 filesystem
+IMAGE_INSTALL_append_arm = "xen"
+IMAGE_INSTALL_append_aarch64 = "xen"
+
 # The hypervisor may not be within the dom0 filesystem image but at least
 # ensure that it is deployable:
 do_build[depends] += "xen:do_deploy"
