@@ -11,3 +11,6 @@ ENABLE_UART = "1"
 
 # Make sure xen mode is enabled in qemu
 PACKAGECONFIG_append_pn-qemu = " xen"
+# For ARM platforms, include fdt as well
+PACKAGECONFIG_append_pn-qemu_arm = " fdt"
+PACKAGECONFIG_append_pn-qemu_aarch64 = " fdt"
