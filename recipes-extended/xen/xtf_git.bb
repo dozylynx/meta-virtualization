@@ -8,7 +8,7 @@ LICENSE = "BSD-2-Clause"
 SRC_URI = "git://xenbits.xen.org/xtf"
 SRCREV = "3e800027016ea4eb19887bf626b46f45fc43fa5d"
 
-COMPATIBLE_HOST = '(x86_64.*).*-linux'
+COMPATIBLE_HOST = '(x86_64.*).*-linux|aarch64.*-linux|arm-.*-linux-gnueabi'
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=a5680865974e05cf0510615ee1d745d8"
 
@@ -34,7 +34,10 @@ do_compile() {
                CPP="${CPP}" \
                LD="${LD}" \
                OBJCOPY="${OBJCOPY}" \
-               PYTHON="${PYTHON}"
+               PYTHON="${PYTHON}" \
+               ${@bb.utils.contains('TARGET_ARCH', 'arm',     'ARCH="arm32"', '', d)} \
+               ${@bb.utils.contains('TARGET_ARCH', 'aarch64', 'ARCH="arm64"', '', d)}
+
     # switch the shebang to python3
     sed 's,^\(#!/usr/bin/env python\)$,\13,' -i "${B}/xtf-runner"
 }
@@ -45,7 +48,10 @@ do_install() {
     oe_runmake install DESTDIR="${D}" \
                        xtfdir="${libexecdir}/${BPN}" \
                        PYTHON="${PYTHON}" \
-                       INSTALL_PROGRAM="install -m 644 -p"
+                       INSTALL_PROGRAM="install -m 644 -p" \
+               ${@bb.utils.contains('TARGET_ARCH', 'arm',     'ARCH="arm32"', '', d)} \
+               ${@bb.utils.contains('TARGET_ARCH', 'aarch64', 'ARCH="arm64"', '', d)}
+
     install -m 755 -p "${B}/xtf-runner" "${D}${libexecdir}/${BPN}/xtf-runner"
 }
 
