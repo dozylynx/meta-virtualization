@@ -16,7 +16,7 @@ IMAGE_NAME="xtf"
 
 IMAGE_INSTALL_append = " xtf"
 
-QB_DEFAULT_FSTYPE = "wic"
+QB_DEFAULT_FSTYPE_qemux86-64 = "wic"
 
 # Set the dom0 memory level lower than that assigned to qemu so that Xen has
 # some available memory for allocating to the XTF microkernel guests to run:
