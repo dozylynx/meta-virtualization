@@ -5,8 +5,16 @@ LICENSE = "BSD-2-Clause"
 # For additional reference on XTF, please see:
 # https://static.sched.com/hosted_files/xendeveloperanddesignsummit2017/79/xtf.pdf
 
-SRC_URI = "git://xenbits.xen.org/xtf"
-SRCREV = "3e800027016ea4eb19887bf626b46f45fc43fa5d"
+#SRC_URI = "git://xenbits.xen.org/xtf"
+#SRCREV = "3e800027016ea4eb19887bf626b46f45fc43fa5d"
+
+SRC_URI = " \
+    git://github.com/orzelmichal/xtf;branch=arm-devel \
+    file://0001-Add-Argo-test.patch \
+    file://xtf-arm64-enable-argo-test.patch \
+    file://xtf-argo-get-domid.patch \
+    "
+SRCREV = "c14f7dd289a40dbe54c14b467fbd6b7072f8e20b"
 
 COMPATIBLE_HOST = '(x86_64.*).*-linux|aarch64.*-linux|arm-.*-linux-gnueabi'
 

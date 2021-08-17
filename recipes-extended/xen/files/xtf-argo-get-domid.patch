@@ -1,0 +1,61 @@
+diff --git a/include/xen/argo.h b/include/xen/argo.h
+index 58ff439..c10f902 100644
+--- a/include/xen/argo.h
++++ b/include/xen/argo.h
+@@ -252,4 +252,18 @@ struct xen_argo_ring_message_header
+  */
+ #define XEN_ARGO_OP_notify              4
+ 
++/*
++ * XEN_ARGO_OP_status
++ *
++ * Indicates availability of Argo to the caller.
++ * If available, indicates the caller's domain address and ability to register
++ * wildcard rings.
++ *
++ * arg1: XEN_GUEST_HANDLE(xen_argo_addr_t) source address
++ * arg2: NULL
++ * arg3: 0 (ZERO)
++ * arg4: 0 (ZERO)
++ */
++#define XEN_ARGO_OP_status              5
++
+ #endif
+diff --git a/tests/argo/main.c b/tests/argo/main.c
+index a40f6f2..ab39b99 100644
+--- a/tests/argo/main.c
++++ b/tests/argo/main.c
+@@ -317,6 +317,20 @@ clear_test_ring(void)
+     return 0;
+ }
+ 
++static int
++argo_get_domid(void)
++{
++    int rc;
++    xen_argo_addr_t addr;
++
++    addr.pad = 0;
++    rc = hypercall_argo_op(XEN_ARGO_OP_status, &addr, NULL, 0, 0);
++    if ( rc )
++        return rc;
++
++    return addr.domain_id;
++}
++
+ void test_main(void)
+ {
+     int own_domid;
+@@ -330,7 +344,11 @@ void test_main(void)
+ 
+     own_domid = xtf_get_domid();
+     if ( own_domid < 0 )
+-        return xtf_error("Error: could not determine domid of the test domain\n");
++    {
++        own_domid = argo_get_domid();
++        if ( own_domid < 0 )
++            return xtf_error("Error: could not determine domid of the test domain\n");
++    }
+ 
+     if ( test_notify_for_one_ring(own_domid, test_aport, false) ||
+          test_unregister_ring(own_domid, test_aport, false) ||

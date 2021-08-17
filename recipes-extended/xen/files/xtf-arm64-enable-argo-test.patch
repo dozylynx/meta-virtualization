@@ -1,0 +1,83 @@
+diff --git a/build/arm64/arch-tests.mk b/build/arm64/arch-tests.mk
+index 1a13ba9..760081c 100644
+--- a/build/arm64/arch-tests.mk
++++ b/build/arm64/arch-tests.mk
+@@ -1,4 +1,4 @@
+ # Supported tests by arm64
+ 
+-# Currently only example test is supported
+-TESTS := $(ROOT)/tests/example
++TESTS := $(ROOT)/tests/example \
++         $(ROOT)/tests/argo
+diff --git a/arch/arm/include/arch/hypercall.h b/arch/arm/include/arch/hypercall.h
+index 626f8a6..bb7efc2 100644
+--- a/arch/arm/include/arch/hypercall.h
++++ b/arch/arm/include/arch/hypercall.h
+@@ -22,6 +22,8 @@ int hypercall_sysctl(xen_sysctl_t *arg);
+ int hypercall_hvm_op(unsigned long op, void *arg);
+ int hypercall_grant_table_op(unsigned int cmd, void *uop, unsigned int count);
+ int hypercall_vcpu_op(int cmd, int vcpuid, void *extra_args);
++int hypercall_argo_op(unsigned int cmd, void *arg1, void *arg2,
++                      unsigned long arg3, unsigned long arg4);
+ 
+ /*
+  * Higher level hypercall helpers
+diff --git a/tests/argo/main.c b/tests/argo/main.c
+index 8eac3d2..1e586b6 100644
+--- a/tests/argo/main.c
++++ b/tests/argo/main.c
+@@ -124,6 +124,10 @@ test_notify_for_one_ring(domid_t query_domid, xen_argo_port_t query_port,
+ #define TEST_RING_SIZE(npages) \
+         (XEN_ARGO_ROUNDUP((((PAGE_SIZE)*npages) - ARGO_RING_OVERHEAD)))
+ 
++#ifdef XTF_ARM_MM_H
++#define virt_to_gfn virt_to_pfn
++#endif
++
+ static int
+ test_register_ring(domid_t own_domid, xen_argo_port_t aport)
+ {
+diff --git a/arch/arm/arm32/hypercall.S b/arch/arm/arm32/hypercall.S
+index 05c79a4..b3476d9 100644
+--- a/arch/arm/arm32/hypercall.S
++++ b/arch/arm/arm32/hypercall.S
+@@ -43,3 +43,4 @@ HYPERCALL2(multicall);
+ HYPERCALL2(vm_assist);
+ HYPERCALL1(sysctl);
+ HYPERCALL1(domctl);
++HYPERCALL5(argo_op);
+diff --git a/arch/arm/arm64/hypercall.S b/arch/arm/arm64/hypercall.S
+index 8013c0a..3e430df 100644
+--- a/arch/arm/arm64/hypercall.S
++++ b/arch/arm/arm64/hypercall.S
+@@ -31,3 +31,4 @@ HYPERCALL2(multicall);
+ HYPERCALL2(vm_assist);
+ HYPERCALL1(sysctl);
+ HYPERCALL1(domctl);
++HYPERCALL5(argo_op);
+diff --git a/tests/argo/main.c b/tests/argo/main.c
+index 4cbb61b..75a6359 100644
+--- a/tests/argo/main.c
++++ b/tests/argo/main.c
+@@ -11,6 +11,7 @@
+ #include <xtf.h>
+ #include <xtf/lib.h>
+ #include <xen/argo.h>
++#include <arch/mm.h>
+ 
+ const char test_title[] = "Argo hypercall test";
+ 
+diff --git a/build/arm64/arch-common.mk b/build/arm64/arch-common.mk
+index f6ce2e3..c92c9e9 100644
+--- a/build/arm64/arch-common.mk
++++ b/build/arm64/arch-common.mk
+@@ -1,7 +1,8 @@
+ # Architecture specific configuration for arm64
+ 
+ SUBARCH := arm
+-ALL_ENVIRONMENTS := 64le mmu64le
++#ALL_ENVIRONMENTS := 64le mmu64le
++ALL_ENVIRONMENTS := mmu64le
+ 
+ MMU_ENVIRONMENTS    := $(filter mmu%,$(ALL_ENVIRONMENTS))
+ 
