@@ -18,6 +18,9 @@ IMAGE_INSTALL_append = " xtf"
 
 QB_DEFAULT_FSTYPE_qemux86-64 = "wic"
 
+# Enable testing of Argo
+QB_XEN_CMDLINE_EXTRA_append = " argo=1,mac-permissive=1"
+
 # Set the dom0 memory level lower than that assigned to qemu so that Xen has
 # some available memory for allocating to the XTF microkernel guests to run:
 QB_MEM = "-m 400"
