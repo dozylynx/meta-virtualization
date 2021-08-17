@@ -9,6 +9,7 @@ SRC_URI = " \
     file://0001-menuconfig-mconf-cfg-Allow-specification-of-ncurses-location.patch \
     file://0001-x86-make-hypervisor-build-with-gcc11.patch \
     file://defconfig_x86-64 \
+    file://defconfig_aarch64 \
     "
 
 LIC_FILES_CHKSUM ?= "file://COPYING;md5=419739e325a50f3d7b4501338e44a4e5"
