@@ -224,6 +224,11 @@ do_configure_common() {
         bbfatal "Unable to copy defconfig to .config"
     fi
 
+    if [ -f "${WORKDIR}/defconfig_${TARGET_ARCH}" ]; then
+        cp "${WORKDIR}/defconfig_${TARGET_ARCH}" "${S}/xen/.config" || \
+        bbfatal "Unable to copy defconfig_${TARGET_ARCH} to .config"
+    fi
+
     unset CFLAGS
 
     # do configure
