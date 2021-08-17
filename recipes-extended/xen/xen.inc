@@ -97,6 +97,9 @@ export LDFLAGS=""
 #   only pass the debug prefix map to the hypervisor build:
 EXTRA_CFLAGS_XEN_CORE="${DEBUG_PREFIX_MAP}"
 
+# FIXME: workaround for current GCC - apply an upstream Xen patch instead
+EXTRA_CFLAGS_XEN_CORE_append = " -Wno-misleading-indentation"
+
 # - The Xen tools build for x86 systems with HVM-mode enabled includes hvmloader
 #   which fails to build when "-m64" is included in flags set via the
 #   EXTRA_CFLAGS_XEN_TOOLS: so clear TUNE_CCARGS on x86 to prevent that.
