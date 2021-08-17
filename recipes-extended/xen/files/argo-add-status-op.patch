@@ -1,0 +1,81 @@
+diff --git a/xen/common/argo.c b/xen/common/argo.c
+index 84da091321..8074c1a911 100644
+--- a/xen/common/argo.c
++++ b/xen/common/argo.c
+@@ -1949,6 +1949,30 @@ sendv(struct domain *src_d, xen_argo_addr_t *src_addr,
+     return ( ret < 0 ) ? ret : len;
+ }
+ 
++static long
++status(const struct domain *currd,
++       XEN_GUEST_HANDLE_PARAM(xen_argo_addr_t) addr_hnd)
++{
++    xen_argo_addr_t addr;
++
++    if ( copy_from_guest(&addr, addr_hnd, 1) )
++        return -EFAULT;
++
++    if ( addr.pad )
++        return -EINVAL;
++
++    addr.aport = ( opt_argo_mac_permissive &&
++                   xsm_argo_register_any_source(currd) ) ? XEN_ARGO_DOMID_ANY :
++                                                           0;
++    addr.domain_id = currd->domain_id;
++
++    if ( __copy_field_to_guest(addr_hnd, &addr, domain_id) ||
++         __copy_field_to_guest(addr_hnd, &addr, aport ))
++        return -EFAULT;
++
++    return 0;
++}
++
+ long
+ do_argo_op(unsigned int cmd, XEN_GUEST_HANDLE_PARAM(void) arg1,
+            XEN_GUEST_HANDLE_PARAM(void) arg2, unsigned long raw_arg3,
+@@ -2076,6 +2101,21 @@ do_argo_op(unsigned int cmd, XEN_GUEST_HANDLE_PARAM(void) arg1,
+         break;
+     }
+ 
++    case XEN_ARGO_OP_status:
++    {
++        XEN_GUEST_HANDLE_PARAM(xen_argo_addr_t) addr_hnd =
++                   guest_handle_cast(arg1, xen_argo_addr_t);
++
++        if ( unlikely((!guest_handle_is_null(arg2)) || arg3 || arg4) )
++        {
++            rc = -EINVAL;
++            break;
++        }
++
++        rc = status(currd, addr_hnd);
++        break;
++    }
++
+     default:
+         rc = -EOPNOTSUPP;
+         break;
+diff --git a/xen/include/public/argo.h b/xen/include/public/argo.h
+index 3397a3a33f..2cad4d01c6 100644
+--- a/xen/include/public/argo.h
++++ b/xen/include/public/argo.h
+@@ -252,4 +252,19 @@ struct xen_argo_ring_message_header
+  */
+ #define XEN_ARGO_OP_notify              4
+ 
++/*
++ * XEN_ARGO_OP_status
++ *
++ * Indicates availability of Argo to the caller.
++ * If available, indicates the caller's domain address and ability to register
++ * wildcard rings.
++ *
++ * arg1: XEN_GUEST_HANDLE(xen_argo_addr_t) source address
++ * arg2: NULL
++ * arg3: 0 (ZERO)
++ * arg4: 0 (ZERO)
++ */
++
++#define XEN_ARGO_OP_status              5
++
+ #endif
