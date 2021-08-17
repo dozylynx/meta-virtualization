@@ -1,0 +1,62 @@
+#--
+# Assemble the source:
+
+    git clone git://git.yoctoproject.org/poky
+    cd poky
+    git checkout 7f3c996d300ce37b44a9048c5f3d6152a4c77b49
+
+    git clone git://git.openembedded.org/meta-openembedded
+    cd meta-openembedded
+    git checkout 4531446e5e1bb2cc92d4a4aeb2dcd0169761fdb7
+    cd -
+
+    git clone git://github.com/dozylynx/meta-virtualization
+    cd meta-virtualization
+    git checkout xtf-arm-devel
+    cd -
+
+#--
+# Configure the build
+
+    source ./oe-init-build-env
+
+# * Edit conf/bblayers.conf to add the extra layers,
+# replacing the dots with the path on your system:
+
+    BBLAYERS ?= " \
+      /......./poky/meta \
+      /......./poky/meta-poky \
+      /......./poky/meta-yocto-bsp \
+      /......./poky/meta-openembedded/meta-oe \
+      /......./poky/meta-openembedded/meta-networking \
+      /......./poky/meta-openembedded/meta-filesystems \
+      /......./poky/meta-openembedded/meta-python \
+      /......./poky/meta-virtualization \
+      "
+
+# * Edit conf/local.conf:
+# Set DL_DIR, SSTATE_DIR, TMPDIR, PACKAGE_CLASSES variables
+# with the correct paths for your system,
+# and append these variable settings to the end of the file:
+
+    MACHINE = "qemuarm64"
+    DISTRO_FEATURES_append = " xen virtualization"
+    QEMU_TARGETS = "i386 x86_64 arm aarch64"
+    PACKAGECONFIG_remove_pn-qemu += " sdl"
+    PREFERRED_VERSION_xen = "4.16%"
+    PREFERRED_VERSION_xen-tools = "4.16%"
+
+# --
+# Run the build:
+
+    bitbake xtf-image
+
+#--
+# Test the image:
+
+    runqemu xtf-image nographic slirp
+
+# log in as root
+
+    cd /usr/libexec/xtf
+    ./xtf-runner argo
